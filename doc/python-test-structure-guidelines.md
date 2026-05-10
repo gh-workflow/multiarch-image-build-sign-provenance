@@ -91,10 +91,12 @@ pytest
 Tests should reflect **architectural intent**, not just execute code.
 
 Optimize for:
+
 - refactor safety
 - clarity
 - long-term maintainability
 
 Not for:
+
 - minimal boilerplate
 - tutorial-style layouts
