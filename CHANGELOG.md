@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-05-10
+
+### Internal
+
+- Bumped development dependencies for pyright, pymarkdownlnt, pytest, pytest-cov, and ruff.
+- Replaced inline Python in the test-suite workflow example drift checks with shell normalization.
+
 ## [0.1.10] - 2026-04-21
 
 ### Changed
