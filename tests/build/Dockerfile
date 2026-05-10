@@ -1,3 +1,3 @@
 FROM alpine:latest
 
-RUN echo "test-date: $(date)" > /test.txt
+RUN printf "test-date: %s\nuuid: %s" "$(date)" "$(uuidgen)" > test.txt
