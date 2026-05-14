@@ -40,18 +40,18 @@ def _run_action() -> str:
     """Execute the publishing flow and return the final manifest digest."""
     image_ref = _require_env("INPUT_IMAGE_REF")
     tags = parse_tags(_require_env("INPUT_TAGS"))
-    entries = parse_platform_digests(_require_env("INPUT_PLATFORM_DIGESTS"))
+    platform_digests = parse_platform_digests(_require_env("INPUT_PLATFORM_DIGESTS"))
     annotations = parse_annotations(os.environ.get("INPUT_ANNOTATIONS", ""))
     certificate_oidc_issuer = _require_env("INPUT_CERTIFICATE_OIDC_ISSUER")
     repository = _require_env("GITHUB_REPOSITORY")
 
     certificate_identity_regexp = caller_certificate_identity_regexp(repository)
 
-    for entry in entries:
-        verification_digests = resolve_platform_verification_digests(image_ref, entry)
+    for platform_digest in platform_digests:
+        verification_digests = resolve_platform_verification_digests(image_ref, platform_digest)
         sign_and_verify_platform_image(
             image_ref=image_ref,
-            index_digest=entry.digest,
+            index_digest=platform_digest.digest,
             digests=verification_digests,
             certificate_oidc_issuer=certificate_oidc_issuer,
             certificate_identity_regexp=certificate_identity_regexp,
@@ -59,7 +59,7 @@ def _run_action() -> str:
 
     manifest_digest = publish_manifest_by_digest(
         image_ref,
-        entries,
+        platform_digests,
         annotations=annotations,
     )
     sign_and_verify_manifest(
@@ -68,11 +68,11 @@ def _run_action() -> str:
         certificate_oidc_issuer=certificate_oidc_issuer,
         certificate_identity_regexp=certificate_identity_regexp,
     )
-    for entry in entries:
+    for platform_digest in platform_digests:
         publish_platform_tags(
             image_ref=image_ref,
-            index_digest=entry.digest,
-            tag_suffix=entry.platform.tag_suffix,
+            index_digest=platform_digest.digest,
+            tag_suffix=platform_digest.platform.tag_suffix,
             tags=tags,
         )
     publish_final_tags(image_ref, manifest_digest, tags)

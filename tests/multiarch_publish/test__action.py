@@ -67,14 +67,14 @@ class ActionTests(unittest.TestCase):
             "GITHUB_OUTPUT": str(output_file),
         }
 
-        entries = [
+        platform_digests = [
             PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:amd64"),
             PlatformDigest(Platform(os="linux", architecture="arm64"), "sha256:arm64"),
         ]
 
         with patch.dict("os.environ", env, clear=False), patch(
             "multiarch_publish._action.parse_platform_digests",
-            return_value=entries,
+            return_value=platform_digests,
         ), patch(
             "multiarch_publish._action.resolve_platform_verification_digests",
             side_effect=[
@@ -128,14 +128,14 @@ class ActionTests(unittest.TestCase):
             "GITHUB_REPOSITORY": "acme/test",
             "GITHUB_OUTPUT": str(output_file),
         }
-        entries = [
+        platform_digests = [
             PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
             PlatformDigest(Platform(os="linux", architecture="arm64"), "sha256:index-arm64"),
         ]
 
         with patch.dict("os.environ", env, clear=False), patch(
             "multiarch_publish._action.parse_platform_digests",
-            return_value=entries,
+            return_value=platform_digests,
         ), patch(
             "multiarch_publish._action.resolve_platform_verification_digests",
             side_effect=[
@@ -191,13 +191,13 @@ class ActionTests(unittest.TestCase):
             "GITHUB_REPOSITORY": "acme/test",
             "GITHUB_OUTPUT": str(output_file),
         }
-        entries = [
+        platform_digests = [
             PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
         ]
 
         with patch.dict("os.environ", env, clear=False), patch(
             "multiarch_publish._action.parse_platform_digests",
-            return_value=entries,
+            return_value=platform_digests,
         ), patch(
             "multiarch_publish._action.resolve_platform_verification_digests",
             return_value=_PlatformVerificationDigests(
