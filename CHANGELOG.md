@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-14
+
+### Changed
+
+- Per-platform tag publishing is now optional via the `publish_platform_tags` input.
+  It defaults to `false`, so the action only publishes the final multi-arch tags unless
+  callers opt in.
+- Updated the README and example workflows to document the new input and show how to
+  opt in when per-platform tags such as `v1.2.3-amd64` are desired.
+
+### Internal
+
+- Bumped `sigstore/cosign-installer` from `v4.1.1` to `v4.1.2`.
+- Made the test image layer content guaranteed unique to keep end-to-end publish tests
+  from reusing indistinguishable image contents.
+
 ## [0.1.11] - 2026-05-10
 
 ### Internal
