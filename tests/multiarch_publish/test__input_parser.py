@@ -5,6 +5,7 @@ from multiarch_publish._input_parser import (
     caller_certificate_identity_regexp,
     parse_annotations,
     parse_platform_digests,
+    parse_publish_platform_tags,
     parse_tags,
 )
 from multiarch_publish._models import Platform
@@ -42,6 +43,17 @@ class InputParserTests(unittest.TestCase):
     def test_parse_annotations_rejects_duplicate_keys(self) -> None:
         with self.assertRaisesRegex(InputError, "duplicate key 'x.test.key'"):
             parse_annotations("x.test.key=value\nx.test.key=other")
+
+    def test_parse_publish_platform_tags_returns_bool(self) -> None:
+        self.assertTrue(parse_publish_platform_tags("true"))
+        self.assertFalse(parse_publish_platform_tags(" FALSE "))
+
+    def test_parse_publish_platform_tags_rejects_invalid_value(self) -> None:
+        with self.assertRaisesRegex(
+            InputError,
+            "publish_platform_tags must be 'true' or 'false'",
+        ):
+            parse_publish_platform_tags("yes")
 
     def test_caller_certificate_identity_regexp_escapes_repo(self) -> None:
         pattern = caller_certificate_identity_regexp("org/repo.name")

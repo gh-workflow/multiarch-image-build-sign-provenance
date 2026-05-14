@@ -16,6 +16,7 @@ class ActionTests(unittest.TestCase):
                 "INPUT_IMAGE_REF": "ghcr.io/acme/test",
                 "INPUT_TAGS": "latest",
                 "INPUT_PLATFORM_DIGESTS": "linux/amd64=sha256:index",
+                "INPUT_PUBLISH_PLATFORM_TAGS": "false",
                 "INPUT_CERTIFICATE_OIDC_ISSUER": "https://token.actions.githubusercontent.com",
                 "GITHUB_REPOSITORY": "acme/test",
                 "GITHUB_OUTPUT": str(output_file),
@@ -62,6 +63,7 @@ class ActionTests(unittest.TestCase):
             "INPUT_IMAGE_REF": "ghcr.io/acme/test",
             "INPUT_TAGS": "latest",
             "INPUT_PLATFORM_DIGESTS": "linux/amd64=sha256:amd64,linux/arm64=sha256:arm64",
+            "INPUT_PUBLISH_PLATFORM_TAGS": "true",
             "INPUT_CERTIFICATE_OIDC_ISSUER": "https://token.actions.githubusercontent.com",
             "GITHUB_REPOSITORY": "acme/test",
             "GITHUB_OUTPUT": str(output_file),
@@ -124,6 +126,7 @@ class ActionTests(unittest.TestCase):
             "INPUT_IMAGE_REF": "ghcr.io/acme/test",
             "INPUT_TAGS": "latest",
             "INPUT_PLATFORM_DIGESTS": "linux/amd64=sha256:index-amd64\nlinux/arm64=sha256:index-arm64",
+            "INPUT_PUBLISH_PLATFORM_TAGS": "false",
             "INPUT_CERTIFICATE_OIDC_ISSUER": "https://token.actions.githubusercontent.com",
             "GITHUB_REPOSITORY": "acme/test",
             "GITHUB_OUTPUT": str(output_file),
@@ -187,6 +190,7 @@ class ActionTests(unittest.TestCase):
                 "org.opencontainers.image.source=https://github.com/acme/test\n"
                 "org.opencontainers.image.version=v1.2.3"
             ),
+            "INPUT_PUBLISH_PLATFORM_TAGS": "false",
             "INPUT_CERTIFICATE_OIDC_ISSUER": "https://token.actions.githubusercontent.com",
             "GITHUB_REPOSITORY": "acme/test",
             "GITHUB_OUTPUT": str(output_file),
@@ -228,6 +232,99 @@ class ActionTests(unittest.TestCase):
                 "org.opencontainers.image.source": "https://github.com/acme/test",
                 "org.opencontainers.image.version": "v1.2.3",
             },
+        )
+
+    def test_run_action_skips_platform_tags_by_default(self) -> None:
+        output_file = Path(tempfile.gettempdir()) / "github-output-no-platform-tags.txt"
+        env = {
+            "INPUT_IMAGE_REF": "ghcr.io/acme/test",
+            "INPUT_TAGS": "latest",
+            "INPUT_PLATFORM_DIGESTS": "linux/amd64=sha256:index-amd64",
+            "INPUT_PUBLISH_PLATFORM_TAGS": "false",
+            "INPUT_CERTIFICATE_OIDC_ISSUER": "https://token.actions.githubusercontent.com",
+            "GITHUB_REPOSITORY": "acme/test",
+            "GITHUB_OUTPUT": str(output_file),
+        }
+        platform_digests = [
+            PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
+        ]
+
+        with patch.dict("os.environ", env, clear=False), patch(
+            "multiarch_publish._action.parse_platform_digests",
+            return_value=platform_digests,
+        ), patch(
+            "multiarch_publish._action.resolve_platform_verification_digests",
+            return_value=_PlatformVerificationDigests(
+                platform_digest="sha256:manifest-amd64",
+                attestation_digest="sha256:attestation-amd64",
+            ),
+        ), patch(
+            "multiarch_publish._action.sign_and_verify_platform_image",
+            return_value=None,
+        ), patch(
+            "multiarch_publish._action.publish_manifest_by_digest",
+            return_value="sha256:manifest",
+        ), patch(
+            "multiarch_publish._action.sign_and_verify_manifest",
+            return_value=None,
+        ), patch(
+            "multiarch_publish._action.publish_platform_tags",
+            return_value=None,
+        ) as publish_platform_tags_mock, patch(
+            "multiarch_publish._action.publish_final_tags",
+            return_value=None,
+        ):
+            _run_action()
+
+        publish_platform_tags_mock.assert_not_called()
+
+    def test_run_action_publishes_platform_tags_when_enabled(self) -> None:
+        output_file = Path(tempfile.gettempdir()) / "github-output-platform-tags-enabled.txt"
+        env = {
+            "INPUT_IMAGE_REF": "ghcr.io/acme/test",
+            "INPUT_TAGS": "latest",
+            "INPUT_PLATFORM_DIGESTS": "linux/amd64=sha256:index-amd64",
+            "INPUT_PUBLISH_PLATFORM_TAGS": "true",
+            "INPUT_CERTIFICATE_OIDC_ISSUER": "https://token.actions.githubusercontent.com",
+            "GITHUB_REPOSITORY": "acme/test",
+            "GITHUB_OUTPUT": str(output_file),
+        }
+        platform_digests = [
+            PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
+        ]
+
+        with patch.dict("os.environ", env, clear=False), patch(
+            "multiarch_publish._action.parse_platform_digests",
+            return_value=platform_digests,
+        ), patch(
+            "multiarch_publish._action.resolve_platform_verification_digests",
+            return_value=_PlatformVerificationDigests(
+                platform_digest="sha256:manifest-amd64",
+                attestation_digest="sha256:attestation-amd64",
+            ),
+        ), patch(
+            "multiarch_publish._action.sign_and_verify_platform_image",
+            return_value=None,
+        ), patch(
+            "multiarch_publish._action.publish_manifest_by_digest",
+            return_value="sha256:manifest",
+        ), patch(
+            "multiarch_publish._action.sign_and_verify_manifest",
+            return_value=None,
+        ), patch(
+            "multiarch_publish._action.publish_platform_tags",
+            return_value=None,
+        ) as publish_platform_tags_mock, patch(
+            "multiarch_publish._action.publish_final_tags",
+            return_value=None,
+        ):
+            _run_action()
+
+        publish_platform_tags_mock.assert_called_once_with(
+            image_ref="ghcr.io/acme/test",
+            index_digest="sha256:index-amd64",
+            tag_suffix="amd64",
+            tags=["latest"],
         )
 
 

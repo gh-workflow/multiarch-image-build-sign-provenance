@@ -77,6 +77,21 @@ def parse_annotations(raw_value: str) -> dict[str, str]:
     return annotations
 
 
+def _parse_bool(raw_value: str, field_name: str) -> bool:
+    """Parse a required boolean input."""
+    normalized_value = raw_value.strip().lower()
+    if normalized_value == "true":
+        return True
+    if normalized_value == "false":
+        return False
+    raise InputError(f"{field_name} must be 'true' or 'false'")
+
+
+def parse_publish_platform_tags(raw_value: str) -> bool:
+    """Parse whether per-platform tags should be published."""
+    return _parse_bool(raw_value, "publish_platform_tags")
+
+
 def caller_certificate_identity_regexp(repository: str) -> str:
     """Build the default cosign identity regexp for caller workflows."""
     escaped_repo = re.escape(repository)

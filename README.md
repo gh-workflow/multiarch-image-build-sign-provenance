@@ -12,7 +12,7 @@ Publish a signed multi-arch container image from pre-built per-architecture imag
 Build and test each architecture in your workflow, then use this action to publish the final image.
 
 - multi-arch tags such as `v1.2.3` and `latest`
-- per-platform tags such as `v1.2.3-amd64`
+- optional per-platform tags such as `v1.2.3-amd64`
 - sign and verify the per-platform images and final multi-arch manifest
 - verify provenance on the per-platform images before publishing final tags
 
@@ -55,6 +55,7 @@ To now build your projects images, change this in the copied workflow:
     platform_digests: |
       linux/amd64=sha256:...
       linux/arm64=sha256:...
+    publish_platform_tags: "true"
     annotations: |
       org.opencontainers.image.source=https://github.com/acme/my-image
       org.opencontainers.image.version=${{ github.ref_name }}
@@ -65,6 +66,9 @@ To now build your projects images, change this in the copied workflow:
 For each requested tag, the action publishes:
 
 - the multi-arch tag, for example `v1.2.3`
+
+If `publish_platform_tags` is set to `true`, the action also publishes:
+
 - a tag on each arch image, for example `v1.2.3-amd64` or `v1.2.3-arm64`
 
 The action does not build images for you. It takes already-built per-platform digests, signs and verifies
@@ -72,13 +76,14 @@ those images, then publishes the final multi-arch manifest and tags.
 
 ## Inputs
 
-| Name                      | Required | Description                                           |
-|---------------------------|----------|-------------------------------------------------------|
-| `image_ref`               | yes      | Image reference, for example `ghcr.io/acme/my-image`. |
-| `tags`                    | yes      | Newline-separated tags to publish.                    |
-| `platform_digests`        | yes      | Newline-separated `platform=digest` entries.          |
-| `annotations`             | no       | Newline-separated `key=value` manifest annotations.   |
-| `certificate_oidc_issuer` | no       | Expected issuer for cosign verification.              |
+| Name                      | Required | Description                                                   |
+|---------------------------|----------|---------------------------------------------------------------|
+| `image_ref`               | yes      | Image reference, for example `ghcr.io/acme/my-image`.         |
+| `tags`                    | yes      | Newline-separated tags to publish.                            |
+| `platform_digests`        | yes      | Newline-separated `platform=digest` entries.                  |
+| `publish_platform_tags`   | no       | Publish per-platform tags like `tag-amd64`. Default: `false`. |
+| `annotations`             | no       | Newline-separated `key=value` manifest annotations.           |
+| `certificate_oidc_issuer` | no       | Expected issuer for cosign verification.                      |
 
 ## Outputs
 

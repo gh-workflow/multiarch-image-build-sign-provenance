@@ -10,6 +10,7 @@ from multiarch_publish._input_parser import (
     caller_certificate_identity_regexp,
     parse_annotations,
     parse_platform_digests,
+    parse_publish_platform_tags,
     parse_tags,
 )
 from multiarch_publish._registry_ops import (
@@ -42,6 +43,9 @@ def _run_action() -> str:
     tags = parse_tags(_require_env("INPUT_TAGS"))
     platform_digests = parse_platform_digests(_require_env("INPUT_PLATFORM_DIGESTS"))
     annotations = parse_annotations(os.environ.get("INPUT_ANNOTATIONS", ""))
+    publish_platform_tags_enabled = parse_publish_platform_tags(
+        _require_env("INPUT_PUBLISH_PLATFORM_TAGS")
+    )
     certificate_oidc_issuer = _require_env("INPUT_CERTIFICATE_OIDC_ISSUER")
     repository = _require_env("GITHUB_REPOSITORY")
 
@@ -68,13 +72,14 @@ def _run_action() -> str:
         certificate_oidc_issuer=certificate_oidc_issuer,
         certificate_identity_regexp=certificate_identity_regexp,
     )
-    for platform_digest in platform_digests:
-        publish_platform_tags(
-            image_ref=image_ref,
-            index_digest=platform_digest.digest,
-            tag_suffix=platform_digest.platform.tag_suffix,
-            tags=tags,
-        )
+    if publish_platform_tags_enabled:
+        for platform_digest in platform_digests:
+            publish_platform_tags(
+                image_ref=image_ref,
+                index_digest=platform_digest.digest,
+                tag_suffix=platform_digest.platform.tag_suffix,
+                tags=tags,
+            )
     publish_final_tags(image_ref, manifest_digest, tags)
 
     write_output("manifest_digest", manifest_digest)

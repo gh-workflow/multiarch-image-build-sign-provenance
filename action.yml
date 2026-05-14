@@ -21,6 +21,10 @@ inputs:
     description: Optional newline-separated list of manifest annotation key=value pairs.
     required: false
     default: ""
+  publish_platform_tags:
+    description: Whether to publish per-platform arch-image tags such as tag-amd64.
+    required: false
+    default: "false"
   certificate_oidc_issuer:
     description: Expected OIDC issuer for cosign verification.
     required: false
@@ -49,6 +53,7 @@ runs:
         INPUT_TAGS: ${{ inputs.tags }}
         INPUT_PLATFORM_DIGESTS: ${{ inputs.platform_digests }}
         INPUT_ANNOTATIONS: ${{ inputs.annotations }}
+        INPUT_PUBLISH_PLATFORM_TAGS: ${{ inputs.publish_platform_tags }}
         INPUT_CERTIFICATE_OIDC_ISSUER: ${{ inputs.certificate_oidc_issuer }}
       run: |
         set -euo pipefail
