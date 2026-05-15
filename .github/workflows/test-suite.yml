@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Ensure workflow actions use immutable refs
-        uses: joshjohanning/ensure-immutable-actions@09f521ead60e64321f3cd36c729195f447fb6b4c  # v2.5.3
+        uses: joshjohanning/ensure-immutable-actions@28e5544cb61fef95d00ee312614a29c8e3a68a19  # v2.5.4
         with:
           exclude-workflows: >-
             example.yml,
