@@ -65,6 +65,14 @@ jobs:
           # Temporary image tag for build/test; final tags are published later.
           tags: ${{ env.IMAGE_REF }}:${{ github.run_id }}-${{ matrix.arch }}-test
 
+      - name: Remove temporary tag on image (optional)
+        uses: ghcr-manager/ghcr-untag-action@0c32d681a3f68580cbcfebfcf126cbab8df872f8  # v1.0.4
+        with:
+          token: ${{ github.token }}
+          owner: ${{ github.repository_owner }}
+          package: ${{ github.event.repository.name }}-demo
+          tags: ${{ github.run_id }}-${{ matrix.arch }}-test
+
       - name: Test image
         # Example smoke test: run the image and assert simple output.
         # Replace this with a real test for your own container.
