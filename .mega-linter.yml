@@ -1,0 +1,26 @@
+FORMATTERS_DISABLE_ERRORS: false
+
+DISABLE_LINTERS:
+  - REPOSITORY_DEVSKIM
+
+# flake8
+PYTHON_FLAKE8_ARGUMENTS: "--max-line-length 120"
+
+# jscpd
+COPYPASTE_JSCPD_ARGUMENTS: "--threshold 10"
+
+# kingfisher
+REPOSITORY_KINGFISHER_ARGUMENTS: "--exclude .venv"
+
+# shfmt
+BASH_SHFMT_ARGUMENTS: "--indent 2 -case-indent"
+
+# trivy
+REPOSITORY_TRIVY_ARGUMENTS: "--ignorefile ./.trivyignore.yaml"
+
+# YAML prettier
+YAML_PRETTIER_FILTER_REGEX_EXCLUDE: "^action\\.yml$"
+
+# zizmor
+ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN
