@@ -39,13 +39,13 @@ jobs:
       digest_arm64: ${{ steps.out-arm64.outputs.digest }}
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c  # v4.2.0
 
       - name: Log in to GHCR
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0  # v4.4.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f  # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -66,7 +66,7 @@ jobs:
           tags: ${{ env.IMAGE_REF }}:${{ github.run_id }}-${{ matrix.arch }}-test
 
       - name: Remove temporary tag on image (optional)
-        uses: ghcr-manager/ghcr-untag-action@ab3e570fdd6d67415ed325bedf29f3ec0777add1  # v1.0.6
+        uses: ghcr-manager/ghcr-untag-action@6691a653f421749a921a1ce0e63fec76bf2748a9  # v1.0.7
         with:
           token: ${{ github.token }}
           owner: ${{ github.repository_owner }}
@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Log in to GHCR
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0  # v4.4.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f  # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
