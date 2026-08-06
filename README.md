@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/github/v/release/gh-workflow/multiarch-image-publish?style=flat-square)](https://github.com/gh-workflow/multiarch-image-publish/releases)
 [![Immutable Releases](https://img.shields.io/badge/releases-immutable-blue?labelColor=333)](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases)
-[![GitHub Marketplace](https://img.shields.io/badge/marketplace-publish--multiarch--image-blue?logo=github&labelColor=333&style=flat-square)](https://github.com/marketplace/actions/publish-multi-arch-image)
+[![GitHub Action](https://img.shields.io/badge/action-composite-blue?logo=githubactions&labelColor=333&style=flat-square)](https://github.com/gh-workflow/multiarch-image-publish)
 [![Tests](https://img.shields.io/github/actions/workflow/status/gh-workflow/multiarch-image-publish/change-validation.yml?branch=main&label=test&style=flat-square)](https://github.com/gh-workflow/multiarch-image-publish/actions/workflows/change-validation.yml)
 [![Multi-Arch](https://img.shields.io/badge/image-multiarch-2496ED?logo=docker&logoColor=white&style=flat-square)](#usage)
 [![Cosign](https://img.shields.io/badge/signing-cosign-3EAAAF?logo=sigstore&logoColor=white&style=flat-square)](#usage)

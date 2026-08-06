@@ -1,0 +1,13 @@
+misconfigurations:
+  - id: AVD-DS-0001
+    paths:
+      - "tests/build/Dockerfile"
+    statement: "'latest' tag is fine for this test Dockerfile"
+  - id: AVD-DS-0002
+    paths:
+      - "tests/build/Dockerfile"
+    statement: "USER is not needed for this test Dockerfile"
+  - id: AVD-DS-0026
+    paths:
+      - "tests/build/Dockerfile"
+    statement: "HEALTHCHECK is not needed for this test Dockerfile"

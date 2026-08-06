@@ -1,0 +1,2 @@
+^https://token\.actions\.githubusercontent\.com/?$
+^https://github\.com/(?:\$|%24)(?:\{|%7B)GITHUB_REPOSITORY(?:\}|%7D)/\.github/workflows/
