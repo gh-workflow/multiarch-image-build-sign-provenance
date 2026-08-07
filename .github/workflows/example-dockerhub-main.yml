@@ -1,15 +1,20 @@
 name: Example Publish Docker Hub Main
 
 "on":
-  # Quick-start mode: run this workflow manually from the GitHub UI.
-  workflow_dispatch:
-  # Run from another workflow
-  workflow_call:
   # To publish automatically on Git tag pushes/releases, uncomment the
   # `push.tags` block below.
   # push:
   #   tags:
   #     - "*"
+  # Quick-start mode: run this workflow manually from the GitHub UI.
+  workflow_dispatch:
+  # Run from another workflow
+  workflow_call:
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
 
 permissions:
   contents: read

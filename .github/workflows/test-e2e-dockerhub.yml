@@ -2,6 +2,11 @@ name: Test End-to-End Docker Hub
 
 "on":
   workflow_call:
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
   workflow_dispatch:
 
 permissions:
@@ -16,7 +21,12 @@ env:
 jobs:
   example:
     uses: ./.github/workflows/example-dockerhub.yml
-    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   verify:
     name: Verify published result

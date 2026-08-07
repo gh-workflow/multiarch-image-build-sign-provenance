@@ -16,6 +16,10 @@ env:
 jobs:
   example:
     uses: ./.github/workflows/example.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
 
   verify:
     name: Verify published result
