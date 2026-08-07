@@ -47,7 +47,9 @@ jobs:
     needs: [change-validation, verify-release-refs]
     if: startsWith(github.ref, 'refs/tags/')
     uses: ./.github/workflows/test-e2e-dockerhub.yml
-    secrets: inherit
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   release:
     name: Publish release
@@ -58,8 +60,9 @@ jobs:
       contents: write
     steps:
       - name: Create GitHub release
-        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228  # v3.0.2
-        with:
-          tag_name: ${{ github.ref_name }}
-          target_commitish: ${{ github.sha }}
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --target "${GITHUB_SHA}" \
+            --generate-notes

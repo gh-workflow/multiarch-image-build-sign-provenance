@@ -1,15 +1,20 @@
 name: Example Publish Docker Hub
 
 "on":
-  # Quick-start mode: run this workflow manually from the GitHub UI.
-  workflow_dispatch:
-  # Run from another workflow
-  workflow_call:
   # To publish automatically on Git tag pushes/releases, uncomment the
   # `push.tags` block below.
   # push:
   #   tags:
   #     - "*"
+  # Quick-start mode: run this workflow manually from the GitHub UI.
+  workflow_dispatch:
+  # Run from another workflow
+  workflow_call:
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
 
 permissions:
   contents: read
@@ -107,7 +112,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Publish multi-arch image
-        uses: gh-workflow/multiarch-image-publish@0.2.1
+        uses: gh-workflow/multiarch-image-publish@0.2.1  # zizmor: ignore[unpinned-uses]
         with:
           image_ref: ${{ env.IMAGE_REF }}
           # Image tag list:
