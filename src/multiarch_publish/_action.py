@@ -52,7 +52,9 @@ def _run_action() -> str:
     certificate_identity_regexp = caller_certificate_identity_regexp(repository)
 
     for platform_digest in platform_digests:
-        verification_digests = resolve_platform_verification_digests(image_ref, platform_digest)
+        verification_digests = resolve_platform_verification_digests(
+            image_ref, platform_digest
+        )
         sign_and_verify_platform_image(
             image_ref=image_ref,
             index_digest=platform_digest.digest,

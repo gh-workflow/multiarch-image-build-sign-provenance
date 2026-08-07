@@ -15,7 +15,9 @@ class CommandRunnerTests(unittest.TestCase):
             stderr="",
         )
 
-        with patch("multiarch_publish._command_runner.subprocess.run", return_value=completed):
+        with patch(
+            "multiarch_publish._command_runner.subprocess.run", return_value=completed
+        ):
             self.assertEqual(run_command(["tool", "arg"]), "ok")
 
     def test_run_command_raises_for_missing_binary(self) -> None:

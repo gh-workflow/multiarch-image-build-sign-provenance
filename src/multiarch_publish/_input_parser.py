@@ -44,7 +44,9 @@ def parse_platform_digests(raw_value: str) -> list[PlatformDigest]:
                 f"invalid platform_digests entry '{entry}': platform and digest must both be non-empty"
             )
 
-        parsed.append(PlatformDigest(platform=Platform.parse(platform_text), digest=digest))
+        parsed.append(
+            PlatformDigest(platform=Platform.parse(platform_text), digest=digest)
+        )
 
     return parsed
 

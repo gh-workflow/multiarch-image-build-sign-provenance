@@ -21,7 +21,9 @@ class InputParserTests(unittest.TestCase):
             "linux/amd64=sha256:aaa\nlinux/arm/v7=sha256:bbb"
         )
 
-        self.assertEqual(entries[0].platform, Platform(os="linux", architecture="amd64"))
+        self.assertEqual(
+            entries[0].platform, Platform(os="linux", architecture="amd64")
+        )
         self.assertEqual(entries[0].digest, "sha256:aaa")
         self.assertEqual(
             entries[1].platform,
@@ -30,7 +32,9 @@ class InputParserTests(unittest.TestCase):
         self.assertEqual(entries[1].digest, "sha256:bbb")
 
     def test_parse_annotations_returns_key_value_pairs(self) -> None:
-        annotations = parse_annotations("org.opencontainers.image.source=https://github.com/acme/test\nx.test.key=value")
+        annotations = parse_annotations(
+            "org.opencontainers.image.source=https://github.com/acme/test\nx.test.key=value"
+        )
 
         self.assertEqual(
             annotations,

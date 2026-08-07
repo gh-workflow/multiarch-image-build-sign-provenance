@@ -17,7 +17,9 @@ class TestStructureRulesTests(TestCase):
                 continue
             test_module_path = _test_module_path_for_src(path, src_dir, tests_dir)
             if not test_module_path.exists():
-                violations.append(f"{path.relative_to(repo_root)}:missing {test_module_path.relative_to(repo_root)}")
+                violations.append(
+                    f"{path.relative_to(repo_root)}:missing {test_module_path.relative_to(repo_root)}"
+                )
                 continue
             test_methods = _test_method_names(test_module_path)
             missing = sorted(
@@ -102,7 +104,9 @@ def _test_method_names(path: Path) -> set[str]:
     tree = _parse_tree(path)
     names: set[str] = set()
     for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test_"):
+        if isinstance(
+            node, (ast.FunctionDef, ast.AsyncFunctionDef)
+        ) and node.name.startswith("test_"):
             names.add(node.name)
     return names
 
