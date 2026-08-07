@@ -62,6 +62,11 @@ class ActionTests(unittest.TestCase):
         self,
     ) -> None:
         call_order: list[str] = []
+
+        def publish_manifest_by_digest(*_: object, **__: object) -> str:
+            call_order.append("manifest")
+            return "sha256:manifest"
+
         output_file = Path(tempfile.gettempdir()) / "github-output-order.txt"
         env = {
             "INPUT_IMAGE_REF": "ghcr.io/acme/test",
@@ -98,8 +103,7 @@ class ActionTests(unittest.TestCase):
             side_effect=lambda **_: call_order.append("platform"),
         ), patch(
             "multiarch_publish._action.publish_manifest_by_digest",
-            side_effect=lambda *_, **__: call_order.append("manifest")
-            or "sha256:manifest",
+            side_effect=publish_manifest_by_digest,
         ), patch(
             "multiarch_publish._action.sign_and_verify_manifest",
             side_effect=lambda **_: call_order.append("verify-manifest"),
