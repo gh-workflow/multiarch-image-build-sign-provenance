@@ -67,22 +67,28 @@ jobs:
       - name: Test image
         # Example smoke test: run the image and assert simple output.
         # Replace this with a real test for your own container.
+        env:
+          TEST_IMAGE: ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }}
         run: |
           docker run --rm \
             --entrypoint /bin/sh \
-            "${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }}" \
+            "${TEST_IMAGE}" \
             -ec 'echo hello-world' \
             | grep -q '^hello-world$'
 
       - name: Export digest (amd64)
         id: out-amd64
         if: matrix.arch == 'amd64'
-        run: echo "digest=${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
+        env:
+          BUILD_DIGEST: ${{ steps.build.outputs.digest }}
+        run: echo "digest=${BUILD_DIGEST}" >> "$GITHUB_OUTPUT"
 
       - name: Export digest (arm64)
         id: out-arm64
         if: matrix.arch == 'arm64'
-        run: echo "digest=${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
+        env:
+          BUILD_DIGEST: ${{ steps.build.outputs.digest }}
+        run: echo "digest=${BUILD_DIGEST}" >> "$GITHUB_OUTPUT"
 
   publish:
     name: Publish multi-arch image
@@ -119,6 +125,9 @@ jobs:
             org.opencontainers.image.version=${{ github.ref_name }}
 
       - name: Print result
+        env:
+          VERSION_IMAGE: ${{ env.IMAGE_REF }}:${{ github.ref_name }}
+          LATEST_IMAGE: ${{ env.IMAGE_REF }}:${{ env.LATEST_TAG }}
         run: |
-          echo "Published ${{ env.IMAGE_REF }}:${{ github.ref_name }}"
-          echo "Published ${{ env.IMAGE_REF }}:${{ env.LATEST_TAG }}"
+          echo "Published ${VERSION_IMAGE}"
+          echo "Published ${LATEST_IMAGE}"
