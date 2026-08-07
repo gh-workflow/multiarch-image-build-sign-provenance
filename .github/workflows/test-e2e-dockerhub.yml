@@ -30,53 +30,64 @@ jobs:
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6  # v4.1.2
 
       - name: Verify final tags resolve
+        env:
+          VERSION_IMAGE: ${{ env.IMAGE_REF }}:${{ env.VERSION_TAG }}
+          LATEST_IMAGE: ${{ env.IMAGE_REF }}:${{ env.LATEST_TAG }}
         run: |
           set -euo pipefail
-          docker buildx imagetools inspect "${{ env.IMAGE_REF }}:${{ env.VERSION_TAG }}"
-          docker buildx imagetools inspect "${{ env.IMAGE_REF }}:${{ env.LATEST_TAG }}"
+          docker buildx imagetools inspect "${VERSION_IMAGE}"
+          docker buildx imagetools inspect "${LATEST_IMAGE}"
 
       - name: Resolve final manifest digest
         id: final-manifest
+        env:
+          VERSION_IMAGE: ${{ env.IMAGE_REF }}:${{ env.VERSION_TAG }}
         run: |
           set -euo pipefail
           digest="$(
             docker buildx imagetools inspect \
               --format '{{json .Manifest}}' \
-              "${{ env.IMAGE_REF }}:${{ env.VERSION_TAG }}" \
+              "${VERSION_IMAGE}" \
               | jq -r '.digest'
           )"
           echo "digest=${digest}" >> "$GITHUB_OUTPUT"
 
       - name: Verify final manifest signature
+        env:
+          FINAL_MANIFEST_IMAGE: ${{ env.IMAGE_REF }}@${{ steps.final-manifest.outputs.digest }}
         run: |
           set -euo pipefail
           certificate_identity_regexp="^https://github.com/${GITHUB_REPOSITORY}/.github/workflows/.*@(?:refs/.*/.*|[0-9a-f]{40})$"
           cosign verify \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --certificate-identity-regexp "${certificate_identity_regexp}" \
-            "${{ env.IMAGE_REF }}@${{ steps.final-manifest.outputs.digest }}"
+            "${FINAL_MANIFEST_IMAGE}"
 
       - name: Verify final tags resolve to manifest digest
+        env:
+          FINAL_MANIFEST_DIGEST: ${{ steps.final-manifest.outputs.digest }}
         run: |
           set -euo pipefail
           for tag in \
-            "${{ env.VERSION_TAG }}" \
-            "${{ env.LATEST_TAG }}"
+            "${VERSION_TAG}" \
+            "${LATEST_TAG}"
           do
             digest="$(
               docker buildx imagetools inspect \
                 --format '{{json .Manifest}}' \
-                "${{ env.IMAGE_REF }}:${tag}" \
+                "${IMAGE_REF}:${tag}" \
                 | jq -r '.digest'
             )"
-            test "$digest" = "${{ steps.final-manifest.outputs.digest }}"
+            test "$digest" = "${FINAL_MANIFEST_DIGEST}"
           done
 
       - name: Verify final manifest includes both platforms
+        env:
+          FINAL_MANIFEST_IMAGE: ${{ env.IMAGE_REF }}@${{ steps.final-manifest.outputs.digest }}
         run: |
           set -euo pipefail
           docker buildx imagetools inspect \
-            --raw "${{ env.IMAGE_REF }}@${{ steps.final-manifest.outputs.digest }}" \
+            --raw "${FINAL_MANIFEST_IMAGE}" \
             | jq -e '
               .manifests as $manifests
               | any($manifests[]?; .platform.os == "linux" and .platform.architecture == "amd64")
@@ -84,45 +95,47 @@ jobs:
             '
 
       - name: Verify final manifest annotations
+        env:
+          FINAL_MANIFEST_IMAGE: ${{ env.IMAGE_REF }}@${{ steps.final-manifest.outputs.digest }}
         run: |
           set -euo pipefail
           docker buildx imagetools inspect \
-            --raw "${{ env.IMAGE_REF }}@${{ steps.final-manifest.outputs.digest }}" \
+            --raw "${FINAL_MANIFEST_IMAGE}" \
             | jq -e '
-              .annotations["org.opencontainers.image.source"] == "${{ env.EXPECTED_SOURCE }}"
-              and .annotations["org.opencontainers.image.version"] == "${{ env.VERSION_TAG }}"
+              .annotations["org.opencontainers.image.source"] == env.EXPECTED_SOURCE
+              and .annotations["org.opencontainers.image.version"] == env.VERSION_TAG
             '
 
       - name: Verify per-platform tags resolve
         run: |
           set -euo pipefail
-          docker buildx imagetools inspect "${{ env.IMAGE_REF }}:${{ env.VERSION_TAG }}-amd64"
-          docker buildx imagetools inspect "${{ env.IMAGE_REF }}:${{ env.VERSION_TAG }}-arm64"
+          docker buildx imagetools inspect "${IMAGE_REF}:${VERSION_TAG}-amd64"
+          docker buildx imagetools inspect "${IMAGE_REF}:${VERSION_TAG}-arm64"
 
       - name: Verify per-platform image signatures
         run: |
           set -euo pipefail
           certificate_identity_regexp="^https://github.com/${GITHUB_REPOSITORY}/.github/workflows/.*@(?:refs/.*/.*|[0-9a-f]{40})$"
           for tag in \
-            "${{ env.VERSION_TAG }}-amd64" \
-            "${{ env.VERSION_TAG }}-arm64"
+            "${VERSION_TAG}-amd64" \
+            "${VERSION_TAG}-arm64"
           do
             cosign verify \
               --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
               --certificate-identity-regexp "${certificate_identity_regexp}" \
-              "${{ env.IMAGE_REF }}:${tag}"
+              "${IMAGE_REF}:${tag}"
           done
 
       - name: Verify per-platform image provenance
         run: |
           set -euo pipefail
           for tag in \
-            "${{ env.VERSION_TAG }}-amd64" \
-            "${{ env.VERSION_TAG }}-arm64"
+            "${VERSION_TAG}-amd64" \
+            "${VERSION_TAG}-arm64"
           do
             attestation_digest="$(
               docker buildx imagetools inspect \
-                --raw "${{ env.IMAGE_REF }}:${tag}" \
+                --raw "${IMAGE_REF}:${tag}" \
                 | jq -r '
                   .manifests[]
                   | select(.annotations["vnd.docker.reference.type"] == "attestation-manifest")
@@ -131,7 +144,7 @@ jobs:
             )"
             test -n "${attestation_digest}"
             docker buildx imagetools inspect \
-              --raw "${{ env.IMAGE_REF }}@${attestation_digest}" \
+              --raw "${IMAGE_REF}@${attestation_digest}" \
               | jq -e '
                 any(.layers[]?; (.annotations["in-toto.io/predicate-type"] // "")
                   | startswith("https://slsa.dev/provenance/"))
