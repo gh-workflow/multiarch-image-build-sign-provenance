@@ -12,11 +12,6 @@ concurrency:
   group: change-validation-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-
 jobs:
   test-suite:
     uses: ./.github/workflows/test-suite.yml
