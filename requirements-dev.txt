@@ -2,6 +2,7 @@
 -r requirements.txt
 pyright>=1.1.411,<2
 pymarkdownlnt>=0.9.39,<1
+pygments>=2.20.0,<3
 pytest>=9.1.1,<10
 pytest-cov>=7.1.0,<8
 ruff>=0.15.22,<1
