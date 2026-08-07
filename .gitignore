@@ -7,3 +7,6 @@ dist/
 
 **/.coverage
 **/_version.py
+
+# megalinter adds this when using checkov
+/.megalinter_github_conf/
