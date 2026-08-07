@@ -11,10 +11,6 @@ name: Example Publish Docker Hub
   #   tags:
   #     - "*"
 
-permissions:
-  contents: read
-  id-token: write
-
 env:
   # Replace this with your own Docker Hub repository.
   IMAGE_REF: wuodan/multiarch-image-publish-demo
@@ -24,6 +20,9 @@ jobs:
   build:
     name: Build image (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       matrix:
         include:
@@ -89,6 +88,8 @@ jobs:
     name: Publish multi-arch image
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Log in to Docker Hub
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f  # v4.6.0
