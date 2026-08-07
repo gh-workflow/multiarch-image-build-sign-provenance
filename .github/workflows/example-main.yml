@@ -11,6 +11,9 @@ name: Example Publish Main
   #   tags:
   #     - "*"
 
+permissions:
+  contents: read
+
 env:
   # Publishes to GHCR in the current repository owner/project name.
   IMAGE_REF: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-demo
