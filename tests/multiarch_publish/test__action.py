@@ -53,10 +53,14 @@ class ActionTests(unittest.TestCase):
             )
 
     def test_main_returns_zero_on_success(self) -> None:
-        with patch("multiarch_publish._action._run_action", return_value="sha256:manifest"):
+        with patch(
+            "multiarch_publish._action._run_action", return_value="sha256:manifest"
+        ):
             self.assertEqual(main(), 0)
 
-    def test_run_action_publishes_platform_tags_after_manifest_verification(self) -> None:
+    def test_run_action_publishes_platform_tags_after_manifest_verification(
+        self,
+    ) -> None:
         call_order: list[str] = []
         output_file = Path(tempfile.gettempdir()) / "github-output-order.txt"
         env = {
@@ -94,7 +98,8 @@ class ActionTests(unittest.TestCase):
             side_effect=lambda **_: call_order.append("platform"),
         ), patch(
             "multiarch_publish._action.publish_manifest_by_digest",
-            side_effect=lambda *_, **__: call_order.append("manifest") or "sha256:manifest",
+            side_effect=lambda *_, **__: call_order.append("manifest")
+            or "sha256:manifest",
         ), patch(
             "multiarch_publish._action.sign_and_verify_manifest",
             side_effect=lambda **_: call_order.append("verify-manifest"),
@@ -132,8 +137,12 @@ class ActionTests(unittest.TestCase):
             "GITHUB_OUTPUT": str(output_file),
         }
         platform_digests = [
-            PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
-            PlatformDigest(Platform(os="linux", architecture="arm64"), "sha256:index-arm64"),
+            PlatformDigest(
+                Platform(os="linux", architecture="amd64"), "sha256:index-amd64"
+            ),
+            PlatformDigest(
+                Platform(os="linux", architecture="arm64"), "sha256:index-arm64"
+            ),
         ]
 
         with patch.dict("os.environ", env, clear=False), patch(
@@ -174,8 +183,12 @@ class ActionTests(unittest.TestCase):
         self.assertEqual(
             manifest_entries,
             [
-                PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
-                PlatformDigest(Platform(os="linux", architecture="arm64"), "sha256:index-arm64"),
+                PlatformDigest(
+                    Platform(os="linux", architecture="amd64"), "sha256:index-amd64"
+                ),
+                PlatformDigest(
+                    Platform(os="linux", architecture="arm64"), "sha256:index-arm64"
+                ),
             ],
         )
         self.assertEqual(publish_manifest_mock.call_args.kwargs["annotations"], {})
@@ -196,7 +209,9 @@ class ActionTests(unittest.TestCase):
             "GITHUB_OUTPUT": str(output_file),
         }
         platform_digests = [
-            PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
+            PlatformDigest(
+                Platform(os="linux", architecture="amd64"), "sha256:index-amd64"
+            ),
         ]
 
         with patch.dict("os.environ", env, clear=False), patch(
@@ -246,7 +261,9 @@ class ActionTests(unittest.TestCase):
             "GITHUB_OUTPUT": str(output_file),
         }
         platform_digests = [
-            PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
+            PlatformDigest(
+                Platform(os="linux", architecture="amd64"), "sha256:index-amd64"
+            ),
         ]
 
         with patch.dict("os.environ", env, clear=False), patch(
@@ -279,7 +296,9 @@ class ActionTests(unittest.TestCase):
         publish_platform_tags_mock.assert_not_called()
 
     def test_run_action_publishes_platform_tags_when_enabled(self) -> None:
-        output_file = Path(tempfile.gettempdir()) / "github-output-platform-tags-enabled.txt"
+        output_file = (
+            Path(tempfile.gettempdir()) / "github-output-platform-tags-enabled.txt"
+        )
         env = {
             "INPUT_IMAGE_REF": "ghcr.io/acme/test",
             "INPUT_TAGS": "latest",
@@ -290,7 +309,9 @@ class ActionTests(unittest.TestCase):
             "GITHUB_OUTPUT": str(output_file),
         }
         platform_digests = [
-            PlatformDigest(Platform(os="linux", architecture="amd64"), "sha256:index-amd64"),
+            PlatformDigest(
+                Platform(os="linux", architecture="amd64"), "sha256:index-amd64"
+            ),
         ]
 
         with patch.dict("os.environ", env, clear=False), patch(

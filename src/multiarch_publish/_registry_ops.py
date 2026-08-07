@@ -88,7 +88,10 @@ def _resolve_platform_manifest_digest(image_ref: str, entry: PlatformDigest) -> 
             continue
 
         candidate_variant = platform_info.get("variant")
-        if entry.platform.variant is not None and candidate_variant != entry.platform.variant:
+        if (
+            entry.platform.variant is not None
+            and candidate_variant != entry.platform.variant
+        ):
             continue
 
         digest = candidate.get("digest", "")
@@ -123,7 +126,10 @@ def resolve_platform_verification_digests(
             continue
 
         candidate_variant = platform_info.get("variant")
-        if entry.platform.variant is not None and candidate_variant != entry.platform.variant:
+        if (
+            entry.platform.variant is not None
+            and candidate_variant != entry.platform.variant
+        ):
             continue
 
         digest = candidate.get("digest", "")
@@ -135,7 +141,9 @@ def resolve_platform_verification_digests(
             f"failed to resolve platform digest for {image_ref}@{entry.digest} ({entry.platform})"
         )
     if attestation_digest == "":
-        raise CommandError(f"failed to resolve attestation digest for {image_ref}@{entry.digest}")
+        raise CommandError(
+            f"failed to resolve attestation digest for {image_ref}@{entry.digest}"
+        )
 
     return _PlatformVerificationDigests(
         platform_digest=platform_digest,
@@ -156,7 +164,9 @@ def _resolve_attestation_digest(image_reference: str) -> str:
     raise CommandError(f"failed to resolve attestation digest for {image_reference}")
 
 
-def _verify_attestation_contains_provenance(image_ref: str, attestation_digest: str) -> None:
+def _verify_attestation_contains_provenance(
+    image_ref: str, attestation_digest: str
+) -> None:
     """Require the attestation manifest to contain an in-toto provenance predicate."""
     manifest = _inspect_raw_manifest(f"{image_ref}@{attestation_digest}")
     for layer in manifest.get("layers", []):
