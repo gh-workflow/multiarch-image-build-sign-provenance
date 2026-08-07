@@ -5,6 +5,9 @@ name: Release
     tags:
       - "*"
 
+permissions:
+  contents: read
+
 jobs:
   change-validation:
     uses: ./.github/workflows/change-validation.yml

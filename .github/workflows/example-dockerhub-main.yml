@@ -11,6 +11,9 @@ name: Example Publish Docker Hub Main
   #   tags:
   #     - "*"
 
+permissions:
+  contents: read
+
 env:
   # Replace this with your own Docker Hub repository.
   IMAGE_REF: wuodan/multiarch-image-publish-demo

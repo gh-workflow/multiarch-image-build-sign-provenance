@@ -4,6 +4,9 @@ name: Test End-to-End Docker Hub
   workflow_call:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   IMAGE_REF: wuodan/multiarch-image-publish-demo
   VERSION_TAG: ${{ github.ref_name }}
