@@ -1,6 +1,6 @@
 """Thin subprocess wrapper with consistent error handling."""
 
-import subprocess
+import subprocess  # nosec B404 - controlled internal subprocess wrapper without shell execution
 
 from multiarch_publish._errors import CommandError
 
@@ -14,7 +14,7 @@ def run_command(command: list[str], *, input_text: str | None = None) -> str:
             input=input_text,
             text=True,
             capture_output=True,
-        )
+        )  # nosec B603 - command is executed without a shell and arguments are passed as a list
     except FileNotFoundError as exc:
         raise CommandError(f"required command not found: {command[0]}") from exc
     except subprocess.CalledProcessError as exc:
